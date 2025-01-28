@@ -5,8 +5,8 @@
 
 # install.packages("ARTofR") # Install only once
 library(ARTofR)
-ARTofR::xxx_title1('Sexual Orientation - Dummy coding')
-ARTofR::xxx_title3('Gender - Dummy coding')
+ARTofR::xxx_title1('Create Demographics Table (APA 7 Style)')
+ARTofR::xxx_title3('Sexual Orientation')
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##                      Install Packages - Only done once                   ----
@@ -38,7 +38,7 @@ library(rempsyc)
 ##                                  Load Data                               ----
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-df<-read_sav("data/Fall24-Baseline_R.sav")
+df<-read_sav("data/Fall24-Baseline_R(FULL).sav")
 
 # remove additional meta data from SPSS .sav file
 df<-as.data.frame(as.matrix(df))
@@ -137,12 +137,12 @@ sample(1:12, 100, replace=T) # Here we're generating 100 random numbers
 
 # sum adds up the number of rows & is.na(df$BirthMonth) is a test of if BirthMonth is NA
 sum(is.na(df$BirthMonth)==T)
-135/nrow(df)
+1/nrow(df)
 
-# So, 135 rows of birth month are NA - 10.61% of the sample
+# So, 1 rows of birth month are NA - 5% of the sample
 
-# Generate 135 random values between 1 and 12
-sample(1:12, sum(is.na(df$BirthMonth)), replace = TRUE) # OR alternatively: sample(1:12, 135, replace = TRUE)
+# Generate 1 random values between 1 and 12
+sample(1:12, sum(is.na(df$BirthMonth)), replace = TRUE) # OR alternatively: sample(1:12, 1, replace = TRUE)
 
 
 # Putting it all together using an ifelse() statement #
@@ -331,7 +331,7 @@ for(gend in gender_var_list){
   df[, gend] <- ifelse(is.na(df$Gender)==T, NA, df[, gend])
 }
 
-rm(gender_var_list)
+rm(gender_var_list, i, gend)
 colnames(df)
 df<-dplyr::select(df, -Gender)
 
@@ -339,8 +339,148 @@ df <- select(df, 1:3, Gender_Male, Gender_Female, Gender_Transgender, Gender_Non
 
 
 
-##~~~~~~~~~~~~~~~~~~~~~~~
-##  ~ Transgender -  ----
-##~~~~~~~~~~~~~~~~~~~~~~~
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##  ~ Transgender - Dummy coding -  ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+# Objectives: Dummy code the response categories of Transgender
+
+# 1 - Transgender_M2F
+# 2 - Transgender_F2M
+# 3 - Transgender_NonConforming
+# 98 - NoneofThese (i.e., not transgender -> NA)
+
+
+# Initialize the dummy coded variables
+df$Transgender_M2F <- NA
+df$Transgender_F2M <- NA
+df$Transgender_NonConforming <- NA
+
+
+# Assign values (0,1) using ifelse()
+df$Transgender_M2F <- ifelse(df$Transgender == 1, 1, 0)
+df$Transgender_F2M <- ifelse(df$Transgender == 2, 1, 0)
+df$Transgender_NonConforming <- ifelse(df$Transgender == 3, 1, 0)
+
+# Assign NAs where applicable
+tg_var_list<-c("Transgender_M2F", "Transgender_F2M", "Transgender_NonConforming")
+
+for(tg_col in tg_var_list){
+  df[,tg_col]<-ifelse(df$Transgender == 98 | is.na(df$Transgender)==T, NA, df$Transgender)
+}
+
+rm(tg_var_list, tg_col)
+
+# Clean up and Reorganize variable list
+df<-dplyr::select(df, -Transgender)
+colnames(df)
+df <- select(df, 1:9, Transgender_M2F, Transgender_F2M, Transgender_NonConforming, everything())
+
+
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##  ~ Sexual Orientation  ----
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Objective: Ensure dummy coded sexual orientation variables are free of NA's except where appropriate
+
+# Identify sexual orientation columns by number
+sex_or_cols<-c(44:51)
+
+for(col in sex_or_cols){
+  df[,col]<- ifelse(is.na(df[,col]) == T, 0, 1)
+}
+
+# create missing_sexual_orientation variable
+df$missing_sexual_orientation <- NA
+
+for(i in 1:nrow(df)){
+  df[i,"missing_sexual_orientation"]<-ifelse(sum(df[i,44:51])==0, 1, 0)
+}
+
+table(df$missing_sexual_orientation)
+
+
+rm(sex_or_cols, col, i)
+
+# reorganize columns
+colnames(df)
+df <- select(df, 1:52, missing_sexual_orientation, everything())
+
+
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##                                                                            --
+##----------------- CREATE DEMOGRAPHICS TABLE (APA 7 STYLE)---------------------
+##                                                                            --
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Identify Demographic Characteristic Columns by number
+colnames(df)
+
+# Age - 3
+# Gender - 4:8
+# Transgender - 10:12
+# Ethnicity - 13:20
+# Race - 23:38
+# Sexual Orientation - 44:51
+
+# Create a new dataframe with only dummy coded demographics (i.e., not age)
+demo_df<-df[,c(4:8, 10:12, 13:20, 23:38, 44:51)]
+colnames(demo_df)
+
+
+# Initialize an empty list to store results
+results_list <- list()
+
+# Loop through each column in the dataset
+for (col_name in colnames(demo_df)) {
+  # Calculate count (N) of non-NA values in the column
+  count <- sum(demo_df[[col_name]], na.rm = TRUE)
+  
+  # Calculate the percentage by dividing count by the total number of rows in the dataset
+  percent <- (count / nrow(demo_df)) * 100
+  
+  # Store both count and percentage as a named vector in the results list
+  results_list[[col_name]] <- c(N = count, Percent = percent)
+}
+
+# Combine the individual results from the list into a single data frame
+combined_results <- do.call(rbind, results_list)
+
+# Convert the combined results into a data frame
+demo_table <- as.data.frame(combined_results)
+
+# Format the 'Percent' column to show one decimal place followed by a percent sign
+demo_table$Percent <- sprintf("%.1f%%", demo_table$Percent)
+
+# Add a new column with the variable names as row labels
+demo_table <- cbind(Variable = rownames(demo_table), demo_table)
+
+# Reset row names to default numbers
+rownames(demo_table) <- NULL
+
+# Print the final results data frame
+print(demo_table)
+
+
+# Remove rows with N = 0
+demo_table<-demo_table[demo_table$N>0,]
+
+# Convert to nice_table using rempsyc
+nice_demo_table<-nice_table(demo_table, title = "Demographic Characteristics")
+
+# Print to Docx for further editing
+
+# print(nice_demo_table, preview="docx")
+
+
+# Add mean and sd of Age manually in word
+describe(df$age)
+mean(na.omit(df$age))
+sd(na.omit(df$age))
+
+
+# Cleanup Environment
+rm(combined_results, demo_df, demo_table, results_list, col_name, count, percent)
