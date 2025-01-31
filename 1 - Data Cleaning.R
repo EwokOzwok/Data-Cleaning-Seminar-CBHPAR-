@@ -18,7 +18,7 @@ ARTofR::xxx_title3('Sexual Orientation')
 # install.packages("car") # Companion to Applied Regression
 # install.packages("caTools") # sample splits and other great data munging functions
 # install.packages("finalfit") # for missing data
-# install.packages("rempsyc) # generates APA 7 tables very quickly in docx format
+# install.packages("rempsyc") # generates APA 7 tables very quickly in docx format
 # install.packages("lubridate") # for handling dates
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,9 +71,11 @@ numeric_cols<-c(1, 3:5, 7:14, 16:31, 33:34, 36:44, 46:79, 81:372)
 
 # Our first 'for-loop'
 
+# Include Step by step of what a for loop is doing
 for(col in numeric_cols){
   df[,col]<-as.numeric(df[,col])
 }
+
 
 # cleanup environment
 rm(numeric_cols, col)
@@ -469,11 +471,11 @@ print(demo_table)
 demo_table<-demo_table[demo_table$N>0,]
 
 # Convert to nice_table using rempsyc
-nice_demo_table<-nice_table(demo_table, title = "Demographic Characteristics")
+# nice_demo_table<-nice_table(demo_table, title = "Demographic Characteristics")
 
 # Print to Docx for further editing
 
-# print(nice_demo_table, preview="docx")
+print(nice_demo_table, preview="docx")
 
 
 # Add mean and sd of Age manually in word
