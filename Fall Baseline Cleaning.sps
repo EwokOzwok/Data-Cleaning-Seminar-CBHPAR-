@@ -1,5 +1,6 @@
 ﻿* Encoding: UTF-8.
 
+
 * Delete Unneeded variables.
 DELETE VARIABLES 
 StartDate EndDate Status IPAddress Duration__in_seconds_ Finished ResponseId RecipientLastName RecipientFirstName RecipientEmail ExternalReference LocationLatitude LocationLongitude DistributionChannel UserLanguage InfConsent.
@@ -399,6 +400,22 @@ RENAME VARIABLE
 (RG_PART3_SCORE=RG_PART3_SCORE)
 (FS_TOTAL=FS_TOTAL).
 Execute.
+
+***********************************************************************************
+***********************************************************************************
+***********************************************************************************
+
+* Creating an Excel Code book. 
+DISPLAY DICTIONARY.
+
+* THEN right click the first table, copy special, as excel worksheet. 
+* Paste first table into an excel worksheet
+* REPEAT for the second table, pasting into a new excel worksheet. 
+
+
+***********************************************************************************
+***********************************************************************************
+***********************************************************************************
 
 
 * Compute Variables.
