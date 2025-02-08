@@ -1,6 +1,7 @@
 ﻿* Encoding: UTF-8.
 
 
+
 * Delete Unneeded variables.
 DELETE VARIABLES 
 StartDate EndDate Status IPAddress Duration__in_seconds_ Finished ResponseId RecipientLastName RecipientFirstName RecipientEmail ExternalReference LocationLatitude LocationLongitude DistributionChannel UserLanguage InfConsent.

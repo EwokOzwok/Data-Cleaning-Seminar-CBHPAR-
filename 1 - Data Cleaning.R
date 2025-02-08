@@ -37,11 +37,15 @@ library(caTools)
 library(finalfit)
 library(rempsyc)
 library(naniar)
+
+
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##                                  Load Data                               ----
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-df<-read_sav("data/Fall24-Baseline_R(FULL).sav")
+df<-read_sav("data/Fall24-Baseline_R.sav")
+
+# df<-read_sav("data/Fall24-Baseline_R(FULL).sav")
 
 # remove additional meta data from SPSS .sav file
 df<-as.data.frame(as.matrix(df))
@@ -56,7 +60,7 @@ df<-as.data.frame(as.matrix(df))
 colnames(df)
 
 # Remove Header columns
-df<-df[,-c(1:4, 6:7, 9:18, 400:404)]
+df <- df[,-c(1:4, 6:7, 9:18, 400:404)]
 colnames(df)
 
 # Examine data-type for all variables
@@ -70,7 +74,7 @@ str(df)
 # All variables are 'character' type,
 # Therefore, we need to change all non-char variables to numeric (by column number)
 colnames(df)
-numeric_cols<-c(1, 3:5, 7:14, 16:31, 33:34, 36:44, 46:79, 81:372)
+numeric_cols<-c(1, 3:5, 7:14, 16:31, 33:34, 36:44, 46:79, 81:388)
 
 # Our first 'for-loop'
 
@@ -312,6 +316,7 @@ table(df$Gender)
 # 6 - Nonbinary
 # 7 - Other
 
+
 # Initialize variables
 df$Gender_Male <- NA
 df$Gender_Female <- NA
@@ -474,7 +479,7 @@ print(demo_table)
 demo_table<-demo_table[demo_table$N>0,]
 
 # Convert to nice_table using rempsyc
-# nice_demo_table<-nice_table(demo_table, title = "Demographic Characteristics")
+nice_demo_table<-nice_table(demo_table, title = "Demographic Characteristics")
 
 # Print to Docx for further editing
 
