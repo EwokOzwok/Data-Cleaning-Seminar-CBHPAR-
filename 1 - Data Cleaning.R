@@ -43,12 +43,12 @@ library(naniar)
 ##                                  Load Data                               ----
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-df<-read_sav("data/Fall24-Baseline_R.sav")
+df <- read_sav("data/Fall24-Baseline_R.sav")
 
 # df<-read_sav("data/Fall24-Baseline_R(FULL).sav")
 
 # remove additional meta data from SPSS .sav file
-df<-as.data.frame(as.matrix(df))
+df <- as.data.frame(as.matrix(df))
 
 
 
@@ -58,6 +58,7 @@ df<-as.data.frame(as.matrix(df))
 
 # Print Column Names
 colnames(df)
+
 
 # Remove Header columns
 df <- df[,-c(1:4, 6:7, 9:18, 400:404)]
@@ -238,7 +239,7 @@ df <- select(df, 1:2, age, everything())
 # 95 corresponds to refusal to respond to the item, so we recode these as NA's
 unique(df$Hispanic)
 
-df$Hispanic<-ifelse(df$Hispanic == 95, NA, df$Hispanic)
+df$Hispanic <- ifelse(df$Hispanic == 95, NA, df$Hispanic)
 
 table(df$Hispanic)
 
@@ -258,13 +259,13 @@ table(df$Hispanic)
 ### Step 1: Use a for loop to replace all NA's with 0's ###
 
 # Identify Ethnicity column numbers (7:13)
-colnames(df[,7:15])
+colnames(df[,7:13])
 
  
 ### Step 2: Use a for loop to replace NA's with 0 ###
 
 for(i in 7:13){
-  df[,i]<-ifelse(is.na(df[,i])==T, 0, df[,i])
+  df[,i] <- ifelse(is.na(df[,i])==T, 0, df[,i])
 }
 
 ### Step 3: Create missing_ethnicity variable ###
@@ -542,9 +543,6 @@ mcar_test <- mcar_test(data_mcar)
 print(mcar_test)
 
 
-finalfit::missing_plot(data_mcar)
-nrow(data_mcar)
-
 # List-wise deletion
 data_mcar_nona <- na.omit(data_mcar)
 
@@ -575,6 +573,8 @@ data_mar <- data %>%
     prob_missing_income = plogis(age - 50),  # Age > 50 increases the probability of missing income
     income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on probability
   )
+
+data_mar <- select(data_mar, -prob_missing_income)
 
 finalfit::missing_plot(data_mar)
 
@@ -609,6 +609,8 @@ exp(.89)
 
 # Perform multiple imputation using MICE
 # Specify which variables are to be imputed, here we are imputing 'income'
+# install.packages("mice")
+library(mice)
 mice_imputation <- mice(data_mar, method = 'pmm', m = 5, seed = 123)
 
 # Check the imputed values
@@ -649,10 +651,14 @@ data_mnar <- data %>%
     income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on the unobserved income
   )
 
+
 finalfit::missing_plot(data_mnar)
 
 mcar_test <- mcar_test(data_mnar)
 print(mcar_test)
+
+data_mnar <- select(data_mnar, -prob_missing_income)
+
 
 # Create a missingness indicator for 'income'
 data_mnar$missing_income <- is.na(data_mnar$income)

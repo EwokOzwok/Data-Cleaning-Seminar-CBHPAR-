@@ -6,6 +6,8 @@
 DELETE VARIABLES 
 StartDate EndDate Status IPAddress Duration__in_seconds_ Finished ResponseId RecipientLastName RecipientFirstName RecipientEmail ExternalReference LocationLatitude LocationLongitude DistributionChannel UserLanguage InfConsent.
 
+DELETE VARIABLES
+SC0 SC1 SC2 SC3 SC4 PHQ9_SCORE AUDIT DAST RG_PART3_SCORE FS_TOTAL.
 
 * Rename Variables.
 RENAME VARIABLE
@@ -389,17 +391,7 @@ RENAME VARIABLE
 (Burnout12=Burnout12)
 (Burnout13=Burnout13)
 (Burnout14=Burnout14)
-(Burnout15=Burnout15)
-(SC0=SC0)
-(SC1=SC1)
-(SC2=SC2)
-(SC3=SC3)
-(SC4=SC4)
-(PHQ9_SCORE=PHQ9_SCORE)
-(AUDIT=AUDIT)
-(DAST=DAST)
-(RG_PART3_SCORE=RG_PART3_SCORE)
-(FS_TOTAL=FS_TOTAL).
+(Burnout15=Burnout15).
 Execute.
 
 ***********************************************************************************
@@ -426,7 +418,11 @@ COMPUTE
 AUDIT_Total_Score = sum.10(AUDIT_1, AUDIT_2, AUDIT_3, AUDIT_4, AUDIT_5, AUDIT_6, AUDIT_7, AUDIT_8, AUDIT_9, AUDIT_10).
 COMPUTE
 PHQ9_Total_Score = sum.9(PHQ9_1,PHQ9_2,PHQ9_3,PHQ9_4,PHQ9_5,PHQ9_6,PHQ9_7,PHQ9_8,PHQ9_9).
+Execute.
 
+FORMATS Flourishing_Mean AUDIT_Total_Score PHQ9_Total_Score (F2).
+VARIABLE LEVEL Flourishing_Mean AUDIT_Total_Score PHQ9_Total_Score (SCALE).
+Execute.
 
 * Add Lables to Newly Computed Variables.
 VARIABLE LABELS
@@ -438,10 +434,16 @@ Execute.
 * Compute Dichotomous M = 1 F = 0 Variable.
 COMPUTE
 Male = 0.
+Execute.
+
 FORMATS Male (F1).
+Execute.
+
 IF (Gender = 1) Male = 1.
 IF (Gender = 2) Male = 0.
 IF(Gender > 2) Male = -1.
+Execute. 
+
 missing values Male (-1).
 VARIABLE LEVEL Male (NOMINAL).
 VALUE LABELS Male 0 'Female' 1 'Male'.
@@ -451,7 +453,7 @@ Execute.
 
 * Generate Descriptive Stats.
 DESCRIPTIVES VARIABLES=PHQ9_Total_Score Flourishing_Mean AUDIT_Total_Score
-  /STATISTICS=MEAN STDDEV MIN MAX.
+  /STATISTICS=MEAN STDDEV MIN MAX VARIANCE.
 Execute.
 
 
@@ -470,7 +472,7 @@ EXECUTE.
 
 *Levene's test syntax as pasted from Analyze - Compare Means - One-Way ANOVA.
 ONEWAY Flourishing_Mean AUDIT_Total_Score PHQ9_Total_Score BY Male
-/STATISTICS DESCRIPTIVES HOMOGENEITY
+/STATISTICS HOMOGENEITY
 /MISSING ANALYSIS.
 * Population Variances are not equal if p < .05.
 

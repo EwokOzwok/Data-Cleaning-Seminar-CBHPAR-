@@ -18,6 +18,7 @@ colnames(df)
 data<-df[,c(4,5,283:291,295:304,347:354)]
 
 head(data)
+colnames(data)
 
 # Keep only rows where gender is either male or female
 
@@ -76,13 +77,14 @@ data$diener_mean <- rowMeans(data[, diener_columns], na.rm = FALSE)
 data$diener_mean[!complete.cases(data[, diener_columns])] <- NA
 
 # Clean up data to remove individual items
-data<-dplyr::select(data, Gender_Male, Gender_Female, audit_total, phq9_total, diener_mean)
+data<-dplyr::select(data, Gender_Male, audit_total, phq9_total, diener_mean)
 
 
 # Examine missingness
 finalfit::missing_plot(data)
 
-
+mcar_test(data)
+data <- na.omit(data)
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##  ~ View Descriptives  ----
@@ -101,7 +103,7 @@ hist(data$phq9_total, main = "PHQ-9 Scores")
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##  ~ View Correlation Matrix  ----
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cor.plot(data[,3:5])
+cor.plot(data[,2:4])
 
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,8 +131,8 @@ var(na.omit(data[data$Gender_Male==0, "diener_mean"]))
 
 
 t.test(data$audit_total ~ data$Gender_Male, var.equal = F) 
-t.test(data$phq9_total ~ data$Gender_Male, var.equal = F)
-t.test(data$diener_mean ~ data$Gender_Male, var.equal = F) # ns
+t.test(data$phq9_total ~ data$Gender_Male, var.equal = T)
+t.test(data$diener_mean ~ data$Gender_Male, var.equal = F) 
 
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
