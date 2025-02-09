@@ -576,6 +576,7 @@ data_mar <- data %>%
     income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on probability
   )
 
+finalfit::missing_plot(data_mar)
 
 # Perform Little's MCAR test
 mcar_test <- mcar_test(data_mar)
@@ -647,6 +648,11 @@ data_mnar <- data %>%
     prob_missing_income = plogis(50000 - income),  # Lower income increases the probability of missingness
     income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on the unobserved income
   )
+
+finalfit::missing_plot(data_mnar)
+
+mcar_test <- mcar_test(data_mnar)
+print(mcar_test)
 
 # Create a missingness indicator for 'income'
 data_mnar$missing_income <- is.na(data_mnar$income)
