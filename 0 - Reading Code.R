@@ -1,24 +1,24 @@
-library(ARTofR)
-ARTofR::xxx_title1('Reading Code')
-ARTofR::xxx_title3('Reading code aloud')
-ARTofR::xxx_title3('MAR')
-ARTofR::xxx_title3('MNAR')
-
-
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##                                                                            --
 ##------------------------------- READING CODE----------------------------------
 ##                                                                            --
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Set x to equal 5 (integer)
+# Set x to equal the integer 5
 x <- 5
 # Display the class of x
 class(x)
 
 
-# Set x to equal 0 (if it is greater than 4) OR 1 (if it is less than 4)
-x <- ifelse(x > 4, 0, 1)
+# Set x to equal to 0 if x is greater than 5, and set x equal to 1 if it is NOT greater than 5
+x <- ifelse(x > 5, 0, 1)
+# Print x
+print(x)
+
+
+# Set x equal to 0 if x is greater than 3 OR less than 6, set x to 1 if it is NOT greater than 3 OR less than 6
+x <- ifelse(x > 3 | x < 6, 0, 1)
+# Print x
 print(x)
 
 
