@@ -577,6 +577,7 @@ data_mar <- data %>%
 data_mar <- select(data_mar, -prob_missing_income)
 
 finalfit::missing_plot(data_mar)
+finalfit::missing_pattern(data_mar)
 
 # Perform Little's MCAR test
 mcar_test <- mcar_test(data_mar)
