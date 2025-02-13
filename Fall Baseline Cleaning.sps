@@ -3,11 +3,12 @@
 
 
 * Delete Unneeded variables.
-DELETE VARIABLES 
-StartDate EndDate Status IPAddress Duration__in_seconds_ Finished ResponseId RecipientLastName RecipientFirstName RecipientEmail ExternalReference LocationLatitude LocationLongitude DistributionChannel UserLanguage InfConsent.
+DELETE VARIABLES
+StartDate EndDate Status IPAddress Duration__in_seconds_ Finished ResponseId RecipientLastName RecipientFirstName ExternalReference LocationLatitude LocationLongitude DistributionChannel UserLanguage InfConsent.
 
 DELETE VARIABLES
 SC0 SC1 SC2 SC3 SC4 PHQ9_SCORE AUDIT DAST RG_PART3_SCORE FS_TOTAL.
+
 
 * Rename Variables.
 RENAME VARIABLE
@@ -420,7 +421,8 @@ COMPUTE
 PHQ9_Total_Score = sum.9(PHQ9_1,PHQ9_2,PHQ9_3,PHQ9_4,PHQ9_5,PHQ9_6,PHQ9_7,PHQ9_8,PHQ9_9).
 Execute.
 
-FORMATS Flourishing_Mean AUDIT_Total_Score PHQ9_Total_Score (F2).
+ALTER TYPE Flourishing_Mean (F4.2).
+FORMATS AUDIT_Total_Score PHQ9_Total_Score (F2).
 VARIABLE LEVEL Flourishing_Mean AUDIT_Total_Score PHQ9_Total_Score (SCALE).
 Execute.
 
