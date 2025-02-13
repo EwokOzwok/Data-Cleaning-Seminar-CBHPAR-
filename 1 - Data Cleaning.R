@@ -61,7 +61,7 @@ colnames(df)
 
 
 # Remove Header columns
-df <- df[,-c(1:4, 6:7, 9:17, 399:403)]
+df <- df[,-c(1:4, 6:7, 9:17, 399:408)]
 colnames(df)
 
 # Examine data-type for all variables
@@ -75,7 +75,7 @@ str(df)
 # All variables are 'character' type,
 # Therefore, we need to change all non-char variables to numeric (by column number)
 colnames(df)
-numeric_cols<-c(1, 3:5, 7:14, 16:31, 33:34, 36:44, 46:79, 81:388)
+numeric_cols<-c(1, 3:5, 7:14, 16:31, 33:34, 36:44, 46:79, 81:383)
 
 # Our first 'for-loop'
 
