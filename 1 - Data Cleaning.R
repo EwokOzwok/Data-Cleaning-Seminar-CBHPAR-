@@ -61,7 +61,7 @@ colnames(df)
 
 
 # Remove Header columns
-df <- df[,-c(1:4, 6:7, 9:18, 400:404)]
+df <- df[,-c(1:4, 6:7, 9:17, 399:403)]
 colnames(df)
 
 # Examine data-type for all variables

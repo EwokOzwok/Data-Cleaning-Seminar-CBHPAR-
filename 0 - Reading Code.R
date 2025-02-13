@@ -54,6 +54,7 @@ print(x)
 
 
 
+
 # Define a function called 'add_five' that accepts an vector input defined inside the function as 'input'
 add_five <- function(input){ # Open Function
   
@@ -63,7 +64,7 @@ add_five <- function(input){ # Open Function
     input[i] = input[i] + 5
   }
   
-  # When done, spit out the new 
+  # When done, spit out the new input
   return(input)
 } # Close Function
 
@@ -77,3 +78,6 @@ new_vector_plus_five <- add_five(new_vector)
 
 # Print the vector 'new_vector_plus_five'
 print(new_vector_plus_five)
+
+
+
