@@ -413,7 +413,7 @@ DISPLAY DICTIONARY.
 
 
 * Compute Variables.
-COMPUTE 
+COMPUTE
 Flourishing_Mean = mean.8(Diener1,Diener2,Diener3,Diener4,Diener5,Diener6,Diener7,Diener8).
 COMPUTE
 AUDIT_Total_Score = sum.10(AUDIT_1, AUDIT_2, AUDIT_3, AUDIT_4, AUDIT_5, AUDIT_6, AUDIT_7, AUDIT_8, AUDIT_9, AUDIT_10).
@@ -471,6 +471,7 @@ GRAPH
   /HISTOGRAM(NORMAL)=Flourishing_Mean
   /TITLE = 'Histogram of Flourishing Mean'.
 EXECUTE.
+
 
 *Levene's test syntax as pasted from Analyze - Compare Means - One-Way ANOVA.
 ONEWAY Flourishing_Mean AUDIT_Total_Score PHQ9_Total_Score BY Male

@@ -49,7 +49,7 @@ df <- read_sav("data/Fall24-Baseline_R.sav")
 
 # remove additional meta data from SPSS .sav file
 df <- as.data.frame(as.matrix(df))
-
+class(df)
 
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,13 +89,13 @@ for(col in numeric_cols){
 rm(numeric_cols, col)
 
 
-str(df)
+str(df[,1:10])
 
 # Change RecordedDate to Date format (Column 2)
 df$RecordedDate<-as.Date(df$RecordedDate)
 df[,2]<-as.Date(df[,2])
 
-
+str(df[,2])
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##                           Variable Name cleaning                         ----
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -574,7 +574,7 @@ data_mar <- data %>%
     income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on probability
   )
 
-data_mar <- select(data_mar, -prob_missing_income)
+data_mar <- select(data_mar, -prob_missing_income) # remove the probability of missingness variable
 
 finalfit::missing_plot(data_mar)
 finalfit::missing_pattern(data_mar)
@@ -604,7 +604,7 @@ summary(glm_test_mar)
 # Converted to an Odds ratio: exp(.89)
 exp(.89)
 
-# This means that for each additional year of age, the odds of missing income are about 2.43 times higher 
+# This means that for each additional year of age, the odds of missing income are 2.43 times higher 
 # compared to individuals who are one year younger, holding satisfaction constant.
 
 

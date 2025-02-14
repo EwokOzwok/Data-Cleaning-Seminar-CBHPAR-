@@ -45,7 +45,7 @@ for(i in x){ # Open For Loop
 # For  (each element i in the vector x)...  
 for(i in 1:length(x)){ # Open For Loop
   # IF the element in x is greater than 4, make the element equal to zero, otherwise keep the value the same
-  x[i] <- ifelse(x[i] > 4, 0, i)
+  x[i] <- ifelse(x[i] > 4, 0, x[i])
   
 } # Close For Loop
 
