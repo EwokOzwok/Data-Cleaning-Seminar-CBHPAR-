@@ -4,11 +4,11 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # install.packages("ARTofR") # Install only once
-library(ARTofR)
-ARTofR::xxx_title1('Missing Data Analysis')
-ARTofR::xxx_title3('MCAR')
-ARTofR::xxx_title3('MAR')
-ARTofR::xxx_title3('MNAR')
+# library(ARTofR)
+# ARTofR::xxx_title1('Missing Data Analysis')
+# ARTofR::xxx_title3('MCAR')
+# ARTofR::xxx_title3('MAR')
+# ARTofR::xxx_title3('MNAR')
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##                      Install Packages - Only done once                   ----
@@ -124,102 +124,7 @@ rm(clean_columns)
 ##~~~~~~~~~~~~~
 
 
-# Objectives: Accurately calcualte participants age using BirthMonth, BirthYear, and RecordedDate
-#             Account for NA's in BirthMonth
-#             Account for the lack of any Day of the Month for participant's Birthday
-
-# Accomplishing this ends up being pretty complex
-
-
-# Steps: 1.) Impute random months for missing BirthMonths (as opposed to only using BirthYear [no NA's])
-#        2.) Use dplyr & lubridate to calculate participants age (accounting for no birth days)
-#        3.) Create computed Age variable
-#        4.) Examine computed Age variable - checking for obvious errors
-#        5.) Remove now, unneeded variables from the data frame
-
-
-### Step 1: Impute random months for missing BirthMonths ###
-
-# Step by step code explanation #
-
-# Sample generates random numbers in a range, in this case 1 through 12 (birth months), with replacement 
-sample(1:12, 100, replace=T) # Here we're generating 100 random numbers
-
-# sum adds up the number of rows & is.na(df$BirthMonth) is a test of if BirthMonth is NA
-sum(is.na(df$BirthMonth)==T)
-1/nrow(df)
-
-# So, 1 rows of birth month are NA - 5% of the sample
-
-# Generate 1 random values between 1 and 12
-sample(1:12, sum(is.na(df$BirthMonth)), replace = TRUE) # OR alternatively: sample(1:12, 1, replace = TRUE)
-
-
-# Putting it all together using an ifelse() statement #
-
-# IF BirthMonth is NA, replace BirthMonth with the list of 135 randomly generated values
-# ELSE keep BirthMonth the same
-
-df$BirthMonth <- ifelse(is.na(df$BirthMonth), sample(1:12, sum(is.na(df$BirthMonth)), replace = TRUE), df$BirthMonth)
-
-describe(df$BirthMonth)
-hist(df$BirthMonth)
-
-
-
-### Step 2: Use dplyr & lubridate (make_date) to calculate participants age ###
-
-df <- df %>%
-  mutate(
-    DayOfBirthIMPUTED = sample(1:28, nrow(df), replace = TRUE),  # Safe range for all months
-    DOB = make_date(BirthYear, BirthMonth, DayOfBirthIMPUTED)
-  )
-
-
-### Step 3: Compute Age Variable ###
-
-# Step by Step Breakdown: #
-
-# df <- df %>%
-# This uses the pipe operator (%>%) from the dplyr package to pass the df data frame to the next function (mutate()).
-# 
-# mutate()
-# This function creates or modifies columns in a data frame. In this case, it is creating a new column called age.
-# 
-# age = year(RecordedDate) - year(DOB)
-# This part calculates the initial age by subtracting the birth year (DOB) from the year of RecordedDate.
-# 
-# ifelse(condition, true_value, false_value)
-# A conditional function:
-#   
-#   If the condition is true, it returns true_value, otherwise false_value.
-#
-# In this case:
-# month(RecordedDate) < month(DOB) | 
-# (month(RecordedDate) == month(DOB) & day(RecordedDate) < day(DOB))
-# checks if the birthday has already occurred in the RecordedDate year.
-
-# Condition Explanation:
-#   
-# month(RecordedDate) < month(DOB): Checks if the recorded month is before the birth month.
-# |: Logical OR operator.
-#
-# (month(RecordedDate) == month(DOB) & day(RecordedDate) < day(DOB)): Checks if the recorded month is the same as the birth month but the recorded day is before the birthday.
-#
-# Together, this condition determines whether the birthday has occurred in the current year.
-# 1, 0 in ifelse()
-# 
-# If the condition is TRUE, subtract 1 from the preliminary age.
-# Otherwise, subtract 0.
-
-
-df <- df %>%
-  mutate(
-    age = year(RecordedDate) - year(DOB) -
-      ifelse(month(RecordedDate) < month(DOB) | 
-               (month(RecordedDate) == month(DOB) & day(RecordedDate) < day(DOB)), 
-             1, 0)
-  )
+df$age <- year(df$RecordedDate)- df$BirthYear
 
 
 ### Step 4: Examine the age column ###
@@ -227,7 +132,7 @@ describe(df$age)
 hist(df$age)
 
 ### Step 5: Remove unneeded columns using dplyr
-df<-dplyr::select(df, -BirthYear, -BirthMonth, -DayOfBirthIMPUTED, -DOB)
+df<-dplyr::select(df, -BirthYear, -BirthMonth)
 
 # Reorganize to make age the 3rd variable
 df <- select(df, 1:2, age, everything())
@@ -261,7 +166,7 @@ table(df$Hispanic)
 # Identify Ethnicity column numbers (7:13)
 colnames(df[,7:13])
 
- 
+
 ### Step 2: Use a for loop to replace NA's with 0 ###
 
 for(i in 7:13){
@@ -494,184 +399,6 @@ sd(na.omit(df$age))
 
 
 # Cleanup Environment
-rm(combined_results, demo_df, demo_table, results_list, col_name, count, percent)
+rm(combined_results, demo_df, demo_table, results_list, col_name, count, percent, nice_demo_table)
 
 
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-##                                                                            --
-##--------------------------- MISSING DATA ANALYSIS-----------------------------
-##                                                                            --
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Plot all missing data (light blue)
-missing_plot(df)
-
-
-
-##~~~~~~~~~~~~~~
-##  ~ MCAR  ----
-##~~~~~~~~~~~~~~
-
-
-# Load necessary libraries
-library(tidyverse)
-
-# Set a random seed for reproducibility
-set.seed(123)
-
-# Step 1: Simulate a dataset with 1000 observations
-n <- 1000
-data <- tibble(
-  age = sample(18:80, n, replace = TRUE),  # Age: random between 18 and 80
-  income = sample(c(20000, 30000, 50000, 70000, 100000), n, replace = TRUE),  # Income: discrete values
-  satisfaction = sample(1:5, n, replace = TRUE)  # Satisfaction: scale from 1 to 5
-)
-
-
-
-# Load the necessary package for Little's MCAR test
-library(naniar)
-
-# Simulate data with MCAR: Introduce missingness randomly
-data_mcar <- data %>%
-  mutate(income = ifelse(runif(n) < 0.1, NA, income))  # 10% missingness randomly in 'income'
-
-finalfit::missing_plot(data_mcar)
-
-# Perform Little's MCAR test
-mcar_test <- mcar_test(data_mcar)
-print(mcar_test)
-
-
-# List-wise deletion
-data_mcar_nona <- na.omit(data_mcar)
-
-finalfit::missing_plot(data_mcar_nona)
-print(paste("Number of missing rows removed = ", nrow(data_mcar)-nrow(data_mcar_nona), sep = ""))
-
-
-
-##~~~~~~~~~~~~~
-##  ~ MAR  ----
-##~~~~~~~~~~~~~
-
-
-set.seed(123)  # For reproducibility
-
-# Simulate data
-data <- tibble(
-  age = sample(18:80, 1000, replace = TRUE),  # Age between 18 and 80
-  satisfaction = sample(1:5, 1000, replace = TRUE),  # Satisfaction on a scale of 1 to 5
-  income = sample(20000:100000, 1000, replace = TRUE)  # Income between 20k and 100k
-)
-
-# Simulate MAR: Probability of missing 'income' depends on 'age'
-# Older individuals have a higher probability of missingness
-data_mar <- data %>%
-  mutate(
-    # Simulate missingness using a logistic function
-    prob_missing_income = plogis(age - 50),  # Age > 50 increases the probability of missing income
-    income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on probability
-  )
-
-data_mar <- select(data_mar, -prob_missing_income) # remove the probability of missingness variable
-
-finalfit::missing_plot(data_mar)
-finalfit::missing_pattern(data_mar)
-
-# Perform Little's MCAR test
-mcar_test <- mcar_test(data_mar)
-print(mcar_test)
-
-
-# MAR Tests
-data_mar_test <- data_mar
-
-# Create a missingness indicator for 'income'
-data_mar_test$missing_income <- is.na(data_mar_test$income)
-
-
-
-# Run a logistic regression model
-glm_test_mar <- glm(missing_income ~ age + satisfaction, data = data_mar_test, family = binomial)
-
-# Summary of the model
-summary(glm_test_mar)
-
-# The intercept is significant, suggesting that the baseline likelihood of missing income is not trivially close to 50%.
-# Age is significant, with a coefficient of .89 
-# In other words, for each additional year of age, the log-odds of missing income increases by 0.890027.
-# Converted to an Odds ratio: exp(.89)
-exp(.89)
-
-# This means that for each additional year of age, the odds of missing income are 2.43 times higher 
-# compared to individuals who are one year younger, holding satisfaction constant.
-
-
-# Perform multiple imputation using MICE
-# Specify which variables are to be imputed, here we are imputing 'income'
-# install.packages("mice")
-library(mice)
-mice_imputation <- mice(data_mar, method = 'pmm', m = 5, seed = 123)
-
-# Check the imputed values
-summary(mice_imputation)
-
-# Generate a completed dataset
-completed_data <- complete(mice_imputation)
-
-# View the completed data
-finalfit::missing_plot(completed_data)
-
-
-
-
-##~~~~~~~~~~~~~~
-##  ~ MNAR  ----
-##~~~~~~~~~~~~~~
-
-set.seed(123)  # For reproducibility
-
-# Simulate data
-data <- tibble(
-  age = sample(18:80, 1000, replace = TRUE),  # Age between 18 and 80
-  satisfaction = sample(1:5, 1000, replace = TRUE),  # Satisfaction on a scale of 1 to 5
-  income = sample(20000:100000, 1000, replace = TRUE)  # Income between 20k and 100k
-)
-
-
-
-
-# Simulate MNAR: Probability of missing 'income' depends on the unobserved 'income' values themselves
-# Lower income individuals are more likely to have missing income
-
-data_mnar <- data %>%
-  mutate(
-    # Simulate missingness using a logistic function based on income (MNAR)
-    prob_missing_income = plogis(50000 - income),  # Lower income increases the probability of missingness
-    income = ifelse(runif(n()) < prob_missing_income, NA, income)  # Simulate missingness based on the unobserved income
-  )
-
-
-finalfit::missing_plot(data_mnar)
-
-mcar_test <- mcar_test(data_mnar)
-print(mcar_test)
-
-data_mnar <- select(data_mnar, -prob_missing_income)
-
-
-# Create a missingness indicator for 'income'
-data_mnar$missing_income <- is.na(data_mnar$income)
-
-# Run a logistic regression model to test if missingness is related to observed variables (age, satisfaction)
-glm_test_mnar <- glm(missing_income ~ age + satisfaction, data = data_mnar, family = binomial)
-
-# Summary of the model
-summary(glm_test_mnar)
-
-
-# The intercept is significant, suggesting that the baseline likelihood of missing income is not trivially close to 50%.
-
-# Both Age & Satisfaction are not significant in predicting missingness. 
-# This implies that, in this model, neither age nor satisfaction does not have a clear influence on whether income is missing or not.
