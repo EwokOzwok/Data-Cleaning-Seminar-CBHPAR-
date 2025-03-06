@@ -11,7 +11,7 @@ This repository contains materials reviewed during the **Data Cleaning Seminar**
 - **PowerPoint Presentation**: Overview of data cleaning processes, key considerations, and practical tips.
 - **SPSS Syntax Files**: Example syntax for cleaning behavioral health research data.
 - **R Script**: Annotated R code showcasing data cleaning techniques.
-- **Seminar Recording**: The video recording will be added following the delivery of the seminar.
+- **'Seminar Recording Link.txt'**: Contains the link to view the video recording of this seminar.
 
 ---
 
